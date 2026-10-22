@@ -4,7 +4,7 @@
 // the current app) and falls back to the cache when offline. ROM sets under
 // roms/ aren't cached here: games kept on the device live in IndexedDB.
 
-const CACHE = 'ledjs-0295ae7b2a70';
+const CACHE = 'ledjs-6b8bf2278cba';
 const FILES = [
   "./",
   "favicon-32.png",
