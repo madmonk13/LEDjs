@@ -76,6 +76,7 @@ export class Device {
     root.classList.toggle('compact', !!C0.compact);
     root.classList.toggle('even-columns', !!C0.evenColumns);
     root.classList.toggle('side-keys', !!C0.sideKeys);
+    root.classList.toggle('plate-top', !!G.plateTop);
 
     const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html !== undefined) e.innerHTML = html; return e; };
     const kase = el('div', 'case');
@@ -98,7 +99,7 @@ export class Device {
         if (typeof id === 'object' && id.lever) { col.append(this.makeLever(el, id)); continue; }
         const b = C.buttons[id];
         const wrap = el('div', `action-wrap${(C.landscapeHide || []).includes(id) ? ' hide-landscape' : ''}`);
-        const k = el('button', 'key action', b.face ? `<span class="key-face">${b.face}</span>` : undefined);
+        const k = el('button', `key action${b.round ? ' round' : ''}`, b.face ? `<span class="key-face">${b.face}</span>` : undefined);
         k.style.setProperty('--btn', b.color);
         k.setAttribute('aria-label', b.label);
         if (b.face) wrap.append(k); else wrap.append(el('span', 'action-label', b.label.toUpperCase()), k);
@@ -153,7 +154,9 @@ export class Device {
   makeSwitch(el, G) {
     const [a, b] = G.switchLabels || ['PRO 1', 'PRO 2'];
     const sw = el('button', 'skill');
-    sw.setAttribute('aria-label', 'Skill');
+    sw.setAttribute('aria-label', G.switchTitle || 'Skill');
+    // A switch that isn't the skill level says what it is (Bowling's: the number of bowlers).
+    if (G.switchTitle) sw.append(el('span', 'action-label', G.switchTitle));
     sw.append(el('span', 'skill-labels', `<span>${a}</span><span>${b}</span>`), el('span', 'track', '<i></i>'));
     sw.addEventListener('click', () => { const pos = this.switchPos === 1 ? 0 : 1; if (this.onSwitch) this.onSwitch(pos); });
     this.skillEl = sw;

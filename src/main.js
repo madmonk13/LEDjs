@@ -165,6 +165,10 @@ function renderGames() {
 function applyGame() {
   const level = state.game ? state.game.s.level : 1;
   const names = state.game?.constructor.levels || ['Pro 1', 'Pro 2'];
+  // A game with one level has nothing to choose (Auto Race, Missile Attack); Bowling's switch
+  // picks the number of bowlers.
+  $('skillRow').hidden = names.length < 2;
+  $('skillName').textContent = state.game?.constructor.switchTitle ? 'Bowlers' : 'Skill';
   const seg = $('skillSeg');
   seg.textContent = '';
   names.forEach((name, i) => {
@@ -424,9 +428,10 @@ function layout() {
   drawNow();
 }
 
-// Auto Race's gear lever beside the display (a phone in portrait): moved out of the panel into the
-// case, and back when the screen turns or grows.
+// A control beside the display (a phone in portrait): Auto Race's gear lever, Missile Attack's
+// Fire button. Moved out of the panel into the case, and back when the screen turns or grows.
 function placeBeside(dev, name) {
+  if (dev._besideHome && !dev._besideHome.el.isConnected) dev._besideHome = null;     // a rebuilt case
   const home = dev._besideHome;
   if (home && (!name || home.name !== name)) {
     if (home.parent.isConnected) home.parent.insertBefore(home.el, home.next);
@@ -435,7 +440,8 @@ function placeBeside(dev, name) {
   }
   dev.classList.toggle('beside-window', !!name);
   if (!name || dev._besideHome) return;
-  const wrap = device.levers[name]?.el.closest('.lever-wrap');
+  // A lever (Auto Race's gear shift) or a button (Missile Attack's Fire).
+  const wrap = device.levers[name]?.el.closest('.lever-wrap') || device.keys[name]?.el.closest('.action-wrap');
   if (!wrap) return;
   dev._besideHome = { name, el: wrap, parent: wrap.parentNode, next: wrap.nextSibling };
   wrap.classList.add('beside');

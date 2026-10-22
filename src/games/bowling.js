@@ -70,6 +70,7 @@ export class Bowling {
   static motion = true;                    // tilt the phone itself to hook the ball
   static levels = ['1 bowler', '2 bowlers'];
   static switchLabels = ['1', '2'];
+  static switchTitle = 'BOWLERS';         // the original's power switch, OFF / 2 / 1, set the number of bowlers
   static arrowsLegend = 'Tilt (hook the ball left or right)';
   // The case: dark brown plastic, orange ribbed flippers down the sides, the name in red on black.
   static body = {
