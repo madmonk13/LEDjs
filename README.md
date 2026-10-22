@@ -17,6 +17,7 @@ games' names are generic; the originals were trademarks of their makers.
 
 | Game | Year | Notes |
 | --- | --- | --- |
+| Armor Battle | 1978 | Following its instruction manual: a 6 × 4 battlefield map, your tank (steady) starting in a corner and the enemy tank (blinking). Fire starts the clock; hold Fire and press a direction to shoot the enemy next to you, a point and a fresh field each hit. Four hidden mines buzz when you're beside one and send you back to your corner; stay beside the enemy and it fires after three warning beeps. The game ends at 99 seconds or after 10 mines. |
 | Auto Race | 1976 | Mattel's first handheld. Following its instruction manual: three lanes, oncoming cars, a 4-speed gear shift and a steering lever, 4 laps in 99 seconds (it only starts in first gear), crashes pushing you back down the track, and the manual's driver ratings by time. |
 | Baseball | 1978 | Following its instruction manual: the computer pitches (fast, medium or slow, straight or curve) and fields; you hit in the strike zone, read the beeps (how many bases a hit is worth) and hold Run to run, with runners caught between bases called out by the original's rules. Walks, home runs, five innings. |
 | Basketball | 1978 | Following its instruction manual: five defenders guarding the basket, the 24-second clock, 2-point baskets from the marked shooting positions (blocked shots to be won back, the rest off the backboard), four 12-minute quarters. |
@@ -27,6 +28,7 @@ games' names are generic; the originals were trademarks of their makers.
 | Missile Attack | 1977 | Following its instruction manual (Space Alert's, the same game): missiles come down three lanes toward your city, through distance bands 6 to 0; Fire launches a torpedo and the left / centre / right guidance control steers it. Hits score their band, farther out scoring more; a miss means a wait to re-arm; twenty missiles a game, in patterns (some shift lanes, some come in pairs), one reaching the centre ends it with Taps, and stopping them all sounds the All Clear. The manual's ratings, Return to Earth to Space Commander. |
 | Soccer | 1978 | Following its instruction manual: five blockers in their zones (two wandering, three cutting off the goal) and a goalkeeper twice as fast who wins the ball by touching it, the marked kicking positions, the 10-minute possession limit, two 45-minute halves. |
 | Space Alert | 1978 | Missile Attack again, as Mattel reissued it after NBC wouldn't air the original's commercial: sold as "Battlestar Galactica: Space Alert", Cylon Raiders attacking your Battlestar, in a black case. |
+| Sub Chase | 1978 | Following its instruction manual: a round radar of 24 positions, your destroyer steered by the arrows and a hidden sub moving in an unknown direction. Slow beeps mean it's beside you, faster beeps that it's straight above, below or under you; Fire drops a depth charge, scoring 5, 3, 2 or 1 by the try, 30 charges a game. The sub's torpedoes streak across the screen: one reaching you ends the game. |
 
 Where a manual leaves something out (how fast the defense moves, exact odds), it's filled in to
 play the way the manual describes: a clean Auto Race in top gear takes a little under 30 seconds,
@@ -66,7 +68,7 @@ steering lever. On larger screens the case is drawn whole, framed in the window.
 | Case | Keyboard | Gamepad |
 | --- | --- | --- |
 | Arrow keys (Auto Race: steering and the gear shift) | Arrows / WASD | D-pad, left stick |
-| Game buttons (Football: Kick, Status, Score; Football 2: Pass, Kick, Status, Score; Baseball: Pitch, Hit, Run, Score; Basketball and Hockey: the two Shoot keys; Soccer: the two Kick keys; Auto Race: Start; Bowling: the left and right sides) | Z, X, C, V (or J, K, L, ;) | Bottom, right, left, top face buttons |
+| Game buttons (Football: Kick, Status, Score; Football 2: Pass, Kick, Status, Score; Baseball: Pitch, Hit, Run, Score; Basketball and Hockey: the two Shoot keys; Soccer: the two Kick keys; Auto Race: Start; Bowling: the left and right sides; Missile Attack, Space Alert, Sub Chase and Armor Battle: Fire) | Z, X, C, V (or J, K, L, ;) | Bottom, right, left, top face buttons |
 | Pause / resume | P | Start |
 
 Bowling's sides run the length of the case, as the original's flippers did: hold both to bring up

@@ -547,8 +547,9 @@ function scaleControls(fill, landscape, u) {
     const swRow = panel.querySelector(':scope > .switch-row');
     if (swRow) n.h += swRow.offsetHeight + u * 1.8;
     const win = dev.querySelector('.window').getBoundingClientRect();
-    const plate = dev.querySelector('.plate').getBoundingClientRect();
-    const roomH = plate.top - win.bottom - u * 6;
+    // (Down to the name plate; on a case with the plate at the top, down to the grille.)
+    const below = dev.querySelector(dev.classList.contains('plate-top') ? '.grille' : '.plate').getBoundingClientRect();
+    const roomH = below.top - win.bottom - u * 6;
     const C = state.game.constructor.controls;
     if (dev.classList.contains('compact')) {
       // Compact (the court games): the keys packed in one centred row, 1.1 units apart, the
