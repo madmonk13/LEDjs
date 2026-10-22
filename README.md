@@ -11,6 +11,8 @@ field, its blips, its beeps and its rules), with no ROMs involved, so everything
 play like the originals but aren't their code, so timing and odds are close rather than exact. The
 games' names are generic; the originals were trademarks of their makers.
 
+**Play it:** [madmonk13.github.io/LEDjs](https://madmonk13.github.io/LEDjs/)
+
 ## Games
 
 | Game | Year | Notes |
