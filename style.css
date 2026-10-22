@@ -1,0 +1,753 @@
+:root {
+  --bg: #0b0d14;
+  --panel: rgba(20, 23, 34, 0.94);
+  --line: rgba(255, 255, 255, 0.09);
+  --text: #e6e8ef;
+  --dim: #8a90a3;
+  --accent: #c4302b;          /* the app icon's color */
+  --accent-ink: #fff;
+  --accent-text: #ff7a66;     /* lighter, for text on the dark background */
+  --radius: 12px;
+  --bar-h: 52px;
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.4 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.dim { color: var(--dim); }
+
+/* ---------------------------------------------------------------- the handheld */
+
+/* main.js sizes #device to the space below the top bar and sets --u (a size
+   unit), --win-w (the LED window's width) and the orientation class. Colours
+   come from the game (device.js sets them as variables). */
+#device {
+  position: fixed;
+  display: flex; align-items: center; justify-content: center;
+  touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", sans-serif;
+}
+#device .case {
+  position: relative;
+  width: 100%; height: 100%;
+  box-sizing: border-box;
+  padding: calc(var(--u) * 2.2) calc(var(--u) * 2);
+  border-radius: calc(var(--u) * 3) calc(var(--u) * 3) calc(var(--u) * 2.2) calc(var(--u) * 2.2);
+  background:
+    radial-gradient(120% 50% at 30% 0%, rgba(255, 255, 255, 0.08), transparent 60%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.18), transparent 8%, transparent 92%, rgba(0, 0, 0, 0.22)),
+    linear-gradient(180deg, var(--case-hi), var(--case));
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.10), inset 0 -3px 0 rgba(0, 0, 0, 0.35),
+    0 calc(var(--u) * 1.2) calc(var(--u) * 4) rgba(0, 0, 0, 0.6);
+  display: grid;
+  grid-template-areas: "window window" "panel panel" "grille plate";
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto 1fr auto;
+  row-gap: calc(var(--u) * 2.4);
+  column-gap: calc(var(--u) * 2);
+}
+#device.landscape .case {
+  grid-template-areas: "side window pad" "side plate pad";
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-rows: 1fr auto;
+  row-gap: calc(var(--u) * 1.4);
+  align-items: center;
+}
+#device.landscape.arrows-left .case { grid-template-areas: "pad window side" "pad plate side"; }
+
+/* On a phone the case is the whole screen: no frame, no rounded corners, its padding taking in
+   the top bar and the safe areas (main.js sets --fill-*). */
+#device.fill .case {
+  border-radius: 0;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.35);
+  padding:
+    calc(var(--fill-t) + var(--u) * 1.2) calc(var(--fill-r) + var(--u) * 2)
+    calc(var(--fill-b) + var(--u) * 1.6) calc(var(--fill-l) + var(--u) * 2);
+}
+/* The panel keeps to its own height, in the middle of the space below the window; the rest is
+   the case's plastic. */
+#device.fill:not(.landscape) .panel { align-self: center; }
+/* Stacked (football on a phone): the buttons in a row on top, the run keys below them, on the
+   right as on the originals (or the left, with the arrow keys moved there). */
+#device.fill.stacked .panel { flex-direction: column; align-items: stretch; gap: calc(var(--u) * 2); }
+#device.fill.stacked .actions { flex-direction: row; align-items: flex-end; gap: calc(var(--u) * 2.6); }
+#device.fill.stacked .skill { margin-top: 0; }
+/* Stacked, the game buttons are a size up from the run keys (main.js allows for it). */
+#device.fill.stacked { --btn-k: 1.25; }
+#device.fill.stacked .group.right { justify-content: space-between; padding: 0 calc(var(--u) * 2); }
+#device.fill.stacked.arrows-left .group.right { flex-direction: row-reverse; }
+/* The key beside the run keys (Football 2's Pass) lines up with left and right; its label sits
+   above it, out of the way of the centring. */
+#device.fill.stacked .group.right .action-wrap { position: relative; }
+#device.fill.stacked .group.right .action-label { position: absolute; bottom: calc(100% + var(--u) * 0.7); white-space: nowrap; }
+body.fill { background: #000; }
+body.fill #bar { background: none; }
+
+/* The display in its ribbed stadium surround. */
+#device .window {
+  grid-area: window;
+  justify-self: center;
+  padding: calc(var(--u) * 2.2);
+  border-radius: calc(var(--u) * 6);
+  background:
+    repeating-radial-gradient(ellipse at 50% 50%, var(--surround-a) 0 calc(var(--u) * 0.45), var(--surround-b) calc(var(--u) * 0.45) calc(var(--u) * 0.9));
+  box-shadow: inset 0 0 calc(var(--u) * 1.2) rgba(0, 0, 0, 0.8), 0 calc(var(--u) * 0.4) calc(var(--u) * 1) rgba(0, 0, 0, 0.45);
+}
+#device canvas {
+  display: block;
+  width: var(--win-w);
+  aspect-ratio: var(--win-aspect, 300 / 160);
+  border-radius: calc(var(--u) * 1.6);
+  box-shadow: 0 0 0 calc(var(--u) * 0.3) #111;
+}
+
+/* The control panel: a darker inset with a printed outline. In landscape its two
+   halves sit either side of the display. */
+#device .panel {
+  grid-area: panel;
+  display: flex; align-items: center; justify-content: space-around;
+  padding: calc(var(--u) * 2) calc(var(--u) * 1.5);
+  border-radius: calc(var(--u) * 1.6);
+  background: var(--panel);
+  box-shadow: inset 0 0 0 calc(var(--u) * 0.6) var(--panel), inset 0 0 0 calc(var(--u) * 0.85) var(--trim);
+}
+#device .group { display: flex; flex-direction: row; align-items: center; justify-content: space-around; gap: calc(var(--u) * 2.6); flex: 1; }
+#device.arrows-left .panel { flex-direction: row-reverse; }
+#device.landscape .panel { display: contents; }
+#device.landscape .group {
+  padding: calc(var(--u) * 2.2) calc(var(--u) * 1.6);
+  border-radius: calc(var(--u) * 1.6);
+  background: var(--panel);
+  box-shadow: inset 0 0 0 calc(var(--u) * 0.6) var(--panel), inset 0 0 0 calc(var(--u) * 0.85) var(--trim);
+}
+#device.landscape .group { align-self: stretch; }
+#device.landscape .group.left { grid-area: side; }
+#device.landscape .group.right { grid-area: pad; }
+
+/* Keys: plastic that sinks when pressed. */
+#device .key {
+  appearance: none; border: 0; padding: 0; margin: 0;
+  touch-action: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 40ms, box-shadow 40ms, filter 40ms;
+}
+#device .pad {
+  justify-self: center;
+  position: relative;
+  display: grid;
+  --k: calc(var(--u) * 7.2 * var(--keys-k, 1));
+  grid-template: repeat(3, var(--k)) / repeat(3, var(--k));
+  grid-template-areas: ". up ." "left mid right" ". down .";
+  gap: calc(var(--u) * var(--pad-gap, 0.9));
+}
+#device .key.arrow {
+  margin: calc(var(--u) * var(--key-m, 0.6));
+  border-radius: calc(var(--u) * 0.8);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--key) 100%, white 14%), var(--key));
+  color: var(--key-ink);
+  box-shadow: 0 calc(var(--u) * 0.55) 0 color-mix(in srgb, var(--key) 50%, black), 0 calc(var(--u) * 0.9) calc(var(--u) * 1.2) rgba(0, 0, 0, 0.45);
+  display: flex; align-items: center; justify-content: center;
+}
+#device .key.arrow svg { width: 44%; height: 44%; opacity: 0.55; }
+#device .key.up { grid-area: up; }
+#device .key.arrow.down { grid-area: down; }
+#device .key.arrow.down svg { transform: rotate(180deg); }
+#device .key.left { grid-area: left; }
+#device .key.left svg { transform: rotate(-90deg); }
+#device .key.right { grid-area: right; }
+#device .key.right svg { transform: rotate(90deg); }
+#device .pad-label {
+  grid-area: mid; align-self: center; justify-self: center;
+  font-weight: 700; font-size: calc(var(--u) * 1.5); letter-spacing: 0.06em; color: var(--print);
+}
+
+/* The game's buttons, in columns (a column may hold the skill switch). */
+#device .actions { display: flex; flex-direction: column; align-items: center; gap: calc(var(--u) * 1.5); }
+#device .action-wrap { display: flex; flex-direction: column; align-items: center; gap: calc(var(--u) * 0.7); }
+#device .key.action {
+  width: calc(var(--u) * 6.6 * var(--btn-k, 1) * var(--keys-k, 1)); height: calc(var(--u) * var(--act-h, 5) * var(--btn-k, 1) * var(--keys-k, 1));
+  border-radius: calc(var(--u) * 0.8);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--btn) 100%, white 18%), var(--btn));
+  box-shadow: 0 calc(var(--u) * 0.55) 0 color-mix(in srgb, var(--btn) 50%, black), 0 calc(var(--u) * 0.9) calc(var(--u) * 1.2) rgba(0, 0, 0, 0.5);
+}
+#device .action-label { font-weight: 700; font-size: calc(var(--u) * 1.5); letter-spacing: 0.06em; color: var(--print); }
+
+/* Pressed: the key sinks onto its shadow. */
+#device .key.isdown { transform: translateY(calc(var(--u) * 0.5)); filter: brightness(0.92); }
+#device .key.arrow.isdown { box-shadow: 0 calc(var(--u) * 0.05) 0 color-mix(in srgb, var(--key) 50%, black), 0 calc(var(--u) * 0.3) calc(var(--u) * 0.6) rgba(0, 0, 0, 0.45); }
+#device .key.action.isdown { box-shadow: 0 calc(var(--u) * 0.05) 0 color-mix(in srgb, var(--btn) 50%, black), 0 calc(var(--u) * 0.3) calc(var(--u) * 0.6) rgba(0, 0, 0, 0.5); }
+
+/* The skill switch: a black slide with PRO 1 / PRO 2 printed above. */
+#device .skill {
+  appearance: none; border: 0; background: none; padding: 0; cursor: pointer;
+  margin-top: calc(var(--u) * 1.4);
+  display: flex; flex-direction: column; align-items: center; gap: calc(var(--u) * 0.6);
+  color: var(--print);
+  -webkit-tap-highlight-color: transparent;
+}
+#device .skill .track {
+  position: relative;
+  width: calc(var(--u) * 7.5); height: calc(var(--u) * 2.4);
+  border-radius: calc(var(--u) * 0.3);
+  background: #0b0b0b;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 0 calc(var(--u) * 0.25) rgba(255, 255, 255, 0.12);
+}
+#device .skill .track i {
+  position: absolute; top: 10%; left: 6%;
+  width: 40%; height: 80%;
+  border-radius: calc(var(--u) * 0.2);
+  background: repeating-linear-gradient(90deg, #2c2c2c 0 2px, #151515 2px 4px);
+  transition: left 120ms;
+}
+#device .skill.pro2 .track i { left: 54%; }
+#device .skill-labels { display: flex; gap: calc(var(--u) * 1.6); font-weight: 700; font-size: calc(var(--u) * 1.3); letter-spacing: 0.05em; }
+#device .skill-labels span { opacity: 0.5; }
+#device .skill:not(.pro2) .skill-labels span:first-child, #device .skill.pro2 .skill-labels span:last-child { opacity: 1; }
+
+/* Football's run keys: the two-way forward key beside up over down. */
+#device .pad.forward {
+  grid-template: repeat(2, var(--k)) / repeat(2, var(--k));
+  grid-template-areas: "right up" "right down";
+}
+#device .pad.forward .key.right { align-self: center; height: calc(var(--k) - var(--u) * 2 * var(--key-m, 0.6)); }
+#device .pad.forward .key.right svg { transform: none; width: 56%; }
+#device .pad.forward .pad-label { display: none; }
+/* Football's switch: its own row along the bottom of the panel, under all the keys (in landscape,
+   where the panel is split either side of the display, under the buttons; main.js moves it). */
+#device .panel:has(> .switch-row) { flex-wrap: wrap; row-gap: calc(var(--u) * 1.8); }
+#device .panel > .switch-row { flex-basis: 100%; margin-top: 0; }
+#device .group > .switch-row { margin-top: calc(var(--u) * 1.2); }
+#device.landscape .group:has(> .switch-row) { flex-wrap: wrap; align-content: center; row-gap: calc(var(--u) * 1.6); }
+#device.landscape .group > .switch-row { flex-basis: 100%; margin-top: 0; }
+/* Mirrored halves (Football): the buttons the run keys' size, with the same spacing. A run key
+   is its grid cell (7.2 units, scaled) less a 0.6-unit margin all round; cells are 0.9 apart. */
+#device.mirror-keys .key.action {
+  width: calc(var(--u) * (7.2 * var(--keys-k, 1) - 2 * var(--key-m, 0.6)));
+  height: calc(var(--u) * (7.2 * var(--keys-k, 1) - 2 * var(--key-m, 0.6)));
+}
+#device.mirror-keys .actions, #device.mirror-keys .group { gap: calc(var(--u) * (var(--pad-gap, 0.9) + 2 * var(--key-m, 0.6))); }
+#device.mirror-keys .group { justify-content: center; }
+/* Letters printed on a key (Football's ST, SC and K). */
+#device .key-face { color: #fff; font-weight: 800; font-size: calc(var(--u) * 2.4 * var(--btn-k, 1) * var(--keys-k, 1)); letter-spacing: 0.02em; text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25); }
+#device .key.action:has(.key-face) { display: flex; align-items: center; justify-content: center; }
+
+/* The arrow printed with a dot (the score key on Basketball, Hockey and Soccer). */
+#device .key.arrow { position: relative; }
+#device .key.arrow.dot::after {
+  content: ''; position: absolute;
+  width: calc(var(--u) * 1.1); height: calc(var(--u) * 1.1); border-radius: 50%;
+  background: var(--key-ink); opacity: 0.7;
+}
+
+/* Levers (Auto Race's gear shift and steering): a slot with numbered positions and a knob. */
+#device .lever-wrap { display: flex; flex-direction: column; align-items: center; gap: calc(var(--u) * 0.7); }
+#device .lever {
+  position: relative; display: flex;
+  border-radius: calc(var(--u) * 0.6);
+  background: #0b0b0b;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 0 calc(var(--u) * 0.25) rgba(255, 255, 255, 0.12);
+}
+#device .lever-wrap.vertical .lever { flex-direction: column; }
+#device .lever-slot {
+  appearance: none; border: 0; background: none; cursor: pointer;
+  width: calc(var(--u) * 5.2); height: calc(var(--u) * 4.4);
+  display: flex; align-items: center; justify-content: flex-end; padding: 0 calc(var(--u) * 0.6) 0 0;
+  color: var(--print); font-weight: 700; font-size: calc(var(--u) * 1.4);
+  touch-action: none; -webkit-tap-highlight-color: transparent;
+}
+#device .lever-wrap:not(.vertical) .lever-slot { width: calc(var(--u) * 5.6); height: calc(var(--u) * 4.6); justify-content: center; align-items: flex-end; padding: 0 0 calc(var(--u) * 0.3); }
+#device .lever-slot span { opacity: 0.5; }
+#device .lever-slot.on span { opacity: 1; }
+#device .lever-knob {
+  position: absolute; pointer-events: none;
+  width: calc(var(--u) * 2.8); height: calc(var(--u) * 2.8); border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #f4f1ea, #b9b3a6 60%, #6f6a60);
+  box-shadow: 0 calc(var(--u) * 0.4) calc(var(--u) * 0.8) rgba(0, 0, 0, 0.6);
+  transform: translate(-50%, -50%);
+  transition: top 90ms, left 90ms;
+}
+#device .lever-wrap.vertical .lever-knob { left: 38%; }
+#device .lever-wrap:not(.vertical) .lever-knob { top: 40%; }
+
+/* Speaker grille and the name plate. */
+#device .grille {
+  grid-area: grille;
+  align-self: stretch;
+  min-height: calc(var(--u) * 8);
+  border-radius: calc(var(--u) * 0.6);
+  background: repeating-linear-gradient(180deg, var(--grille) 0 calc(var(--u) * 0.5), transparent calc(var(--u) * 0.5) calc(var(--u) * 1.3));
+}
+#device.landscape .grille { display: none; }
+#device .plate {
+  grid-area: plate;
+  align-self: end; justify-self: end;
+  padding: calc(var(--u) * 0.9) calc(var(--u) * 1.8);
+  border-radius: calc(var(--u) * 0.6);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--plate) 100%, white 20%), var(--plate));
+  box-shadow: 0 0 0 calc(var(--u) * 0.35) rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  color: var(--plate-ink);
+  font-weight: 900; font-size: calc(var(--u) * 2.6); letter-spacing: 0.02em; line-height: 1;
+}
+#device.landscape .plate { justify-self: center; align-self: start; }
+
+/* ---------------------------------------------------------------- top bar */
+
+#bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 5;
+  height: calc(var(--bar-h) + var(--safe-t));
+  padding: var(--safe-t) calc(2px + var(--safe-r)) 0 calc(2px + var(--safe-l));
+  display: flex; align-items: stretch;
+  background: linear-gradient(rgba(11, 13, 20, 0.9), rgba(11, 13, 20, 0));
+}
+#bar #cartBtn { margin-left: auto; }
+/* Each bar button's touch target fills the strip's full height and is padded
+   wider than the visible face, so a slightly-off tap still lands on it rather
+   than missing and falling through to the joystick or fire zone. */
+#bar > button {
+  width: auto; height: auto;
+  padding: 0 8px;
+  display: grid; place-items: center;
+  background: none; border: 0; border-radius: 0;
+}
+#bar > button:active { background: none; }
+/* Solid faces: Game Boy screens are often near white, and in landscape the
+   picture runs up behind the bar. */
+#bar .face {
+  display: grid; place-items: center;
+  background: rgb(31, 34, 46);
+  border: 1px solid var(--line);
+}
+#bar > button:active .face { background: rgb(52, 56, 72); }
+#bar .icon .face { width: 42px; height: 42px; border-radius: 12px; }
+#bar .pill .face { padding: 8px 12px; border-radius: 999px; }
+#bar .pill.held .face { background: var(--accent); color: var(--accent-ink); }
+/* Landscape: the game runs up behind the bar, so drop the bar's shading. */
+@media (orientation: landscape) { #bar { background: none; } }
+
+
+button {
+  font: inherit;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 14px;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+button:active { background: rgba(255, 255, 255, 0.16); }
+button.primary { background: var(--accent); border-color: transparent; color: var(--accent-ink); font-weight: 700; }
+button.icon {
+  width: 42px; height: 42px; padding: 0;
+  display: grid; place-items: center;
+  border-radius: 12px;
+}
+button.pill {
+  padding: 8px 12px;
+  border-radius: 999px;
+  font: 700 11px/1 ui-monospace, "SF Mono", Menlo, monospace;
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+button.pill.held { background: var(--accent); color: var(--accent-ink); }
+
+/* ---------------------------------------------------------------- menu sheet */
+
+.sheet-backdrop {
+  position: fixed; inset: 0; z-index: 8;
+  background: var(--bg);
+  animation: fade 0.2s ease;
+}
+.sheet-backdrop[hidden] { display: none; }
+/* Settings take over the whole screen; content is centred at a readable width. */
+.sheet {
+  width: 100%; height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: calc(6px + var(--safe-t)) max(calc(18px + var(--safe-r)), calc((100% - 560px) / 2))
+    calc(18px + var(--safe-b)) max(calc(18px + var(--safe-l)), calc((100% - 560px) / 2));
+  background: var(--bg);
+  animation: slide-up 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
+  -webkit-user-select: none;
+}
+@keyframes fade { from { opacity: 0; } }
+@keyframes slide-up { from { transform: translateY(24px); opacity: 0; } }
+
+.sheet-head {
+  position: sticky; top: 0; z-index: 1;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0;
+  background: linear-gradient(var(--bg) 80%, transparent);
+}
+.sheet h1 { margin: 0; font: 800 20px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.04em; }
+.sheet-head .install { display: inline-flex; align-items: center; gap: 6px; margin: 0 10px 0 auto; padding: 6px 12px; font-weight: 600; }
+.sheet-head .install[hidden] { display: none; }
+.sheet h1 span { color: var(--accent-text); }
+.sheet section { padding: 14px 0; border-top: 1px solid var(--line); }
+.sheet h2 {
+  margin: 0 0 10px;
+  font: 700 11px/1 ui-monospace, "SF Mono", Menlo, monospace;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--dim);
+}
+.row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.row button { flex: 1; }
+.hint { margin: 8px 0 0; color: var(--dim); font-size: 13px; }
+button.wide { width: 100%; }
+
+/* Cartridge collection */
+/* Cartridges screen: the list fills the space below the add button and scrolls
+   on its own, laid out in as many columns as fit. */
+.carts-sheet { display: flex; flex-direction: column; overflow: hidden; }
+.carts-sheet .sec-cartridges { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.carts {
+  flex: 1; min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  list-style: none; margin: 10px 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 6px; align-content: start;
+}
+.cart-item {
+  display: flex; align-items: stretch; gap: 6px;
+}
+.cart-play {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+  text-align: left;
+  padding: 10px 12px;
+}
+.cart-play b { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+.cart-play small { color: var(--dim); font-size: 12px; }
+.cart-item.playing .cart-play { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.cart-item.playing .cart-play small { color: var(--accent-text); font-weight: 600; }
+.cart-remove {
+  flex: none; min-width: 44px;
+  padding: 0 12px;
+  color: var(--dim);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.cart-remove.confirm { background: #a33; border-color: transparent; color: #fff; font-size: 13px; font-weight: 700; }
+
+.seg { display: flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.seg button { flex: 1; border: 0; border-radius: 0; background: transparent; padding: 10px 6px; font-size: 14px; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button.active { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+
+.field { display: block; margin-top: 12px; }
+.field > span { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.field output { color: var(--dim); font-family: ui-monospace, Menlo, monospace; font-size: 13px; }
+.field input[type=range] { width: 100%; accent-color: var(--accent); }
+.field input[type=range]:disabled { opacity: 0.4; }
+
+/* iOS-style switch */
+label.switch {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 44px;
+  cursor: pointer;
+}
+label.switch span { display: flex; flex-direction: column; }
+label.switch small { color: var(--dim); font-size: 12px; }
+label.switch input { position: absolute; opacity: 0; pointer-events: none; }
+label.switch i {
+  position: relative; flex: none;
+  width: 50px; height: 30px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  transition: background 0.2s ease;
+}
+label.switch i::after {
+  content: ""; position: absolute; top: 3px; left: 3px;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+label.switch input:checked + i { background: var(--accent); }
+label.switch input:checked + i::after { transform: translateX(20px); }
+label.switch input:focus-visible + i { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* Landscape: settings sections side by side across the full screen, without
+   scrolling. */
+@media (orientation: landscape) {
+  .sheet {
+    overflow: hidden;
+    padding: calc(4px + var(--safe-t)) max(calc(16px + var(--safe-r)), calc((100% - 1000px) / 2))
+      calc(10px + var(--safe-b)) max(calc(16px + var(--safe-l)), calc((100% - 1000px) / 2));
+  }
+  .settings-sheet {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      "head head"
+      "controls sound"
+      "controls console";
+    column-gap: 32px;
+    padding-left: max(calc(16px + var(--safe-l)), calc((100% - 820px) / 2));
+    padding-right: max(calc(16px + var(--safe-r)), calc((100% - 820px) / 2));
+  }
+  .sheet-head { grid-area: head; position: static; background: none; }
+  .sheet section { min-height: 0; }
+  .sec-controls { grid-area: controls; }
+  .sec-sound { grid-area: sound; }
+  .sec-console { grid-area: console; }
+  .field.inline { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .field.inline > span { margin: 0; }
+  .field.inline .seg { flex: none; width: 190px; }
+}
+
+/* Phone landscape: compact spacing so everything fits the short screen. */
+@media (orientation: landscape) and (max-height: 540px) {
+  .sheet-head { padding: 2px 0 4px; }
+  .sheet-head button.icon { width: 36px; height: 36px; }
+  .sheet h1 { font-size: 17px; }
+  .sheet h2 { margin-bottom: 4px; }
+  .sheet section { padding: 6px 0 0; }
+  .sec-cartridges .hint { margin-top: 4px; font-size: 12px; }
+  #loadBtn { padding: 8px 12px; }
+  .cart-play { padding: 7px 10px; }
+  .cart-remove { min-width: 40px; }
+
+  label.switch { min-height: 32px; gap: 10px; }
+  label.switch small { font-size: 11px; line-height: 1.25; }
+  label.switch i { width: 44px; height: 26px; }
+  label.switch i::after { width: 20px; height: 20px; }
+  label.switch input:checked + i::after { transform: translateX(18px); }
+
+  .field { margin-top: 4px; }
+  .field > span { margin-bottom: 2px; }
+  .field.inline { min-height: 34px; }
+  .field.inline .seg { flex: 1; width: auto; max-width: 190px; }
+  .field.inline .seg button { padding: 6px 2px; }
+  .seg button { padding: 6px; font-size: 13px; }
+  .field input[type=range] { margin: 0; }
+  .row { margin-top: 4px; }
+  .row button { padding: 7px 12px; }
+}
+
+/* ---------------------------------------------------------------- loading modal + toast */
+
+#loading {
+  position: fixed; inset: 0; z-index: 12;
+  display: grid; place-items: center;
+  background: rgba(11, 13, 20, 0.6);
+  backdrop-filter: blur(6px);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+#loading.show { opacity: 1; pointer-events: auto; }
+#loading .card {
+  min-width: 220px; max-width: calc(100vw - 32px);
+  padding: 22px 26px 20px;
+  text-align: center;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  transform: translateY(6px) scale(0.98);
+  transition: transform 0.25s ease;
+}
+#loading.show .card { transform: none; }
+/* A cartridge sliding into its slot. */
+#loading .cart-slot {
+  position: relative;
+  width: 64px; height: 44px;
+  margin: 0 auto 14px;
+  border-bottom: 3px solid var(--dim);
+  overflow: hidden;
+}
+#loading .cart-chip {
+  position: absolute; left: 12px; bottom: 0;
+  width: 40px; height: 34px;
+  background: var(--accent);
+  border-radius: 4px 4px 0 0;
+  box-shadow: inset 0 -8px 0 rgba(0, 0, 0, 0.25), inset 0 6px 0 rgba(255, 255, 255, 0.15);
+  animation: cart-insert 1.1s ease-in-out infinite;
+}
+@keyframes cart-insert {
+  0%, 15% { transform: translateY(-14px); }
+  55%, 75% { transform: translateY(12px); }
+  100% { transform: translateY(-14px); }
+}
+#loading .label {
+  font: 700 11px/1 ui-monospace, "SF Mono", Menlo, monospace;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--dim);
+}
+#loading .name {
+  margin-top: 6px;
+  font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+@media (prefers-reduced-motion: reduce) {
+  #loading .cart-chip { animation: none; transform: translateY(4px); }
+}
+
+/* ---------------------------------------------------------------- update screen (src/sw-update.js) */
+
+/* While a new version installs: a cartridge filling up as its files are saved, and a bar. */
+#updating {
+  position: fixed; inset: 0; z-index: 14;
+  display: grid; place-items: center;
+  background: rgba(11, 13, 20, 0.82);
+  backdrop-filter: blur(8px);
+  opacity: 0; pointer-events: auto;
+  transition: opacity 0.3s ease;
+}
+#updating.show { opacity: 1; }
+#updating .card {
+  width: min(280px, calc(100vw - 32px));
+  padding: 22px 24px 20px;
+  text-align: center;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+#updating .update-cart {
+  position: relative;
+  width: 44px; height: 52px;
+  margin: 0 auto 14px;
+  border: 2px solid var(--accent);
+  border-radius: 6px 6px 3px 3px;
+  overflow: hidden;
+}
+/* The cartridge's label window. */
+#updating .update-label {
+  position: absolute; left: 7px; right: 7px; top: 7px; height: 16px;
+  border: 1px solid var(--accent); border-radius: 2px;
+  opacity: 0.6;
+}
+#updating .update-fill {
+  position: absolute; inset: 0;
+  background: var(--accent);
+  opacity: 0.85;
+  transform: scaleY(0.04); transform-origin: bottom;
+  transition: transform 0.25s ease;
+}
+#updating .label {
+  font: 700 11px/1 ui-monospace, "SF Mono", Menlo, monospace;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent);
+}
+#updating .name { margin-top: 6px; font-weight: 600; }
+#updating .detail { margin-top: 6px; font-size: 12px; color: var(--dim); }
+#updating .bar {
+  height: 4px; margin-top: 14px;
+  background: var(--line); border-radius: 2px; overflow: hidden;
+}
+#updating .bar > div {
+  height: 100%;
+  background: var(--accent);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.25s ease;
+}
+/* Waiting for the first progress report: the fill breathes. */
+#updating:not(.done) .update-fill { animation: update-pulse 1.4s ease-in-out infinite; }
+@keyframes update-pulse { 50% { opacity: 0.55; } }
+@media (prefers-reduced-motion: reduce) {
+  #updating:not(.done) .update-fill { animation: none; }
+}
+
+#toast {
+  position: fixed; left: 50%; bottom: 24px; z-index: 11;
+  transform: translate(-50%, 12px);
+  max-width: calc(100vw - 32px);
+  padding: 10px 14px;
+  background: #3a1414;
+  border: 1px solid #a33;
+  border-radius: var(--radius);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+}
+#toast.show { opacity: 1; transform: translate(-50%, 0); }
+#toast.info { background: var(--panel); border-color: var(--accent); }
+#toast.success { background: #123a1f; border-color: #2e9a4f; }
+
+/* Pause: the bar button swaps its icon, and a veil over the game says so. */
+#pauseBtn .i-play { display: none; }
+#pauseBtn:disabled { opacity: 0.35; pointer-events: none; }
+body.paused #pauseBtn .i-pause { display: none; }
+body.paused #pauseBtn .i-play { display: block; }
+#paused {
+  position: fixed; inset: 0; z-index: 4;
+  display: grid; place-items: center;
+  background: rgba(11, 13, 20, 0.55);
+  -webkit-tap-highlight-color: transparent;
+}
+#paused[hidden] { display: none; }
+#paused .card {
+  display: grid; gap: 4px; justify-items: center;
+  padding: 16px 28px; border-radius: 16px;
+  background: rgba(20, 23, 34, 0.92); color: var(--fg, #e8eaf2);
+  font-weight: 600;
+}
+#paused .card b { font-size: 20px; letter-spacing: 0.04em; }
+#paused .card span { font-size: 13px; opacity: 0.7; font-weight: 500; }
+#paused .card .game { font-size: 15px; opacity: 1; font-weight: 600; color: var(--accent-text, #7c9bff); }
+
+/* Booting: a card over the game for its first few seconds from power-on. */
+#booting {
+  position: fixed; inset: 0; z-index: 6;
+  display: grid; place-items: center;
+  -webkit-tap-highlight-color: transparent;
+  animation: boot-fade 3s ease forwards;
+}
+#booting[hidden] { display: none; }
+#booting .card {
+  display: grid; gap: 4px; justify-items: center;
+  padding: 16px 28px; border-radius: 16px;
+  background: rgba(20, 23, 34, 0.92); color: var(--text, #e6e8ef);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+#booting .card span { font-size: 13px; opacity: 0.7; font-weight: 500; letter-spacing: 0.04em; }
+#booting .card b { font-size: 20px; font-weight: 600; }
+@keyframes boot-fade { 0%, 80% { opacity: 1; } 100% { opacity: 0; } }
+
+/* Hints for the way the player is playing (body[data-input], from input-mode.js): the case is the
+   touch control; a keyboard or gamepad gets a card listing the game's keys or buttons as it
+   starts and while paused (help-intro; the first key or tap fades it), and the list in Settings. */
+.for-keys, .for-pad { display: none; }
+body[data-input="keys"] .for-touch, body[data-input="pad"] .for-touch { display: none; }
+body[data-input="keys"] .for-keys, body[data-input="pad"] .for-pad { display: inline; }
+body:not([data-input="touch"]) .touch-only { display: none !important; }
+#keyHelp {
+  position: fixed; left: 0; right: 0; bottom: calc(18px + var(--safe-b, 0px)); z-index: 5;
+  display: none; justify-content: center; pointer-events: none;
+  opacity: 0; transition: opacity 0.6s ease;
+}
+body:not([data-input="touch"]) #keyHelp { display: flex; }
+body.help-intro #keyHelp { opacity: 1; }
+#keyHelp .card {
+  max-width: calc(100% - 32px); padding: 12px 18px; border-radius: 14px;
+  background: rgba(20, 23, 34, 0.9); color: var(--text, #e8eaf2);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+.control-list, #keyHelp dl {
+  display: grid; grid-template-columns: auto 1fr; gap: 5px 14px; margin: 0; font-size: 13px;
+}
+.control-list dt, #keyHelp dt { font-family: ui-monospace, Menlo, monospace; color: var(--accent-text, #fff); white-space: nowrap; text-align: right; }
+.control-list dd, #keyHelp dd { margin: 0; color: var(--dim, #aab); }
+.control-list { margin-top: 12px; }
+.control-list:empty, body[data-input="touch"] .control-list { display: none; }

@@ -1,0 +1,12 @@
+{
+  "name": "ledjs",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Touch-first recreations of the 1970s LED handheld sports games",
+  "type": "module",
+  "scripts": {
+    "start": "node tools/build-sw.mjs && python3 -m http.server 2609",
+    "icons": "node tools/make-icons.mjs",
+    "sw": "node tools/build-sw.mjs"
+  }
+}

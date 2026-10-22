@@ -1,0 +1,88 @@
+// Keyboard + gamepad + the case's keys -> the arrow keys and up to four game buttons.
+//
+// Keys: arrows / WASD for the arrow keys; Z, X, C and V (or J, K, L and ;) for
+// the game's buttons in the order the game lists them. Gamepads: the d-pad or
+// left stick, and face buttons 1-4.
+
+// Button bits, as the games read them: four directions, then four game buttons.
+export const BTN = { left: 0x01, right: 0x02, up: 0x04, down: 0x08, b1: 0x10, b2: 0x20, b3: 0x40, b4: 0x80 };
+
+const KEYS = {
+  ArrowRight: BTN.right, KeyD: BTN.right, ArrowLeft: BTN.left, KeyA: BTN.left,
+  ArrowUp: BTN.up, KeyW: BTN.up, ArrowDown: BTN.down, KeyS: BTN.down,
+  KeyZ: BTN.b1, KeyJ: BTN.b1, KeyX: BTN.b2, KeyK: BTN.b2, KeyC: BTN.b3, KeyL: BTN.b3, KeyV: BTN.b4, Semicolon: BTN.b4,
+};
+// Direction bits from the case's arrow keys (see device.js) -> button bits.
+const TOUCH_DIR = [[0x10, BTN.up], [0x20, BTN.down], [0x40, BTN.left], [0x80, BTN.right]];
+
+export class Input {
+  constructor() {
+    this.keys = new Set();
+    this.onActivity = null;   // called on keyboard or gamepad input
+    this.padStartHeld = false; // the gamepad's Start resumed the game: ignored until let go
+    // Extra sources (the case's keys): objects with dir() -> direction bits
+    // (0x10 up, 0x20 down, 0x40 left, 0x80 right) and buttons() -> game button bits.
+    this.sources = [];
+    window.addEventListener('keydown', (e) => {
+      if (!(e.code in KEYS) || e.metaKey || e.ctrlKey || e.altKey) return;
+      // While a full-screen sheet is open, keys (Return especially) belong to its controls.
+      if (document.querySelector('.sheet-backdrop:not([hidden])')) return;
+      const t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'BUTTON')) t.blur();
+      e.preventDefault();
+      this.keys.add(e.code);
+      if (this.onActivity) this.onActivity();
+    });
+    window.addEventListener('keyup', (e) => this.keys.delete(e.code));
+    window.addEventListener('blur', () => this.keys.clear());
+  }
+
+  // Everything pressed right now, as button bits.
+  read() {
+    let bits = 0;
+    for (const code of this.keys) bits |= KEYS[code] || 0;
+
+    for (const src of this.sources) {
+      const d = src.dir();
+      for (const [t, g] of TOUCH_DIR) if (d & t) bits |= g;
+      bits |= src.buttons();
+    }
+
+    const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+    for (const pad of pads) {
+      if (!pad) continue;
+      const b = (i) => pad.buttons[i] && pad.buttons[i].pressed;
+      const ax = pad.axes[0] || 0, ay = pad.axes[1] || 0;
+      let p = 0;
+      if (ay < -0.5 || b(12)) p |= BTN.up;
+      if (ay > 0.5 || b(13)) p |= BTN.down;
+      if (ax < -0.5 || b(14)) p |= BTN.left;
+      if (ax > 0.5 || b(15)) p |= BTN.right;
+      if (b(0)) p |= BTN.b1;
+      if (b(1)) p |= BTN.b2;
+      if (b(2)) p |= BTN.b3;
+      if (b(3)) p |= BTN.b4;
+      if (!b(9)) this.padStartHeld = false;
+      if (p && this.onActivity) this.onActivity();
+      bits |= p;
+      break;                    // one player
+    }
+
+    // A real d-pad can't press opposite directions together.
+    if ((bits & (BTN.left | BTN.right)) === (BTN.left | BTN.right)) bits &= ~(BTN.left | BTN.right);
+    if ((bits & (BTN.up | BTN.down)) === (BTN.up | BTN.down)) bits &= ~(BTN.up | BTN.down);
+    return bits;
+  }
+}
+
+// A game's controls, as [keys, what they do] rows for the keyboard or gamepad hints (mode
+// 'keys' or 'pad'): the arrow keys if its case has them, then its buttons in input order.
+const KEY_NAMES = ['Z  or  J', 'X  or  K', 'C  or  L', 'V  or  ;'];
+const PAD_NAMES = ['Bottom button', 'Right button', 'Left button', 'Top button'];
+export function controlLegend(G, mode) {
+  const keys = mode === 'keys', rows = [];
+  if (G.controls.columns.some((c) => c === 'arrows') || G.arrowsLegend) rows.push([keys ? 'Arrows  or  W A S D' : 'D-pad  ·  left stick', G.arrowsLegend || 'Arrow keys']);
+  G.actions.forEach((a, i) => rows.push([keys ? KEY_NAMES[i] : PAD_NAMES[i], (G.controls.buttons[a] || {}).label || a]));
+  rows.push([keys ? 'P' : 'Start', 'Pause / resume']);
+  return rows;
+}
