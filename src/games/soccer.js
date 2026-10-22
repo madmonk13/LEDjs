@@ -38,18 +38,26 @@ export class Soccer extends CourtGame {
   static year = 1978;
   static actions = ['kick', 'kick2'];
   static controls = {
-    columns: [['kick'], 'arrows', ['kick2', 'switch']],
+    columns: [['kick'], 'arrows', ['kick2']],
     split: 2,
+    switchBelow: true,
+    mirror: true,
+    compact: true,                        // on a phone: one row of same-size keys (see style.css)
+    switchTop: true,                      // landscape: the switch above the display...
+    landscapeHide: ['kick'],                // ...and one kick key, on the right
+    keysFirst: true,                      // ...as big as the football games', the display giving way
     dot: 'down',
-    buttons: { kick: { label: 'Kick', color: '#e8e4da' }, kick2: { label: 'Kick', color: '#e8e4da' } },
+    buttons: { kick: { label: 'Kick', color: '#efeee8' }, kick2: { label: 'Kick', color: '#efeee8' } },
   };
   static levels = ['1', '2'];
   static switchLabels = ['1', '2'];
   static arrowsLegend = 'Move (down, the dotted arrow, repeats the score)';
-  // The case: white plastic, a black control panel, white arrows and kick keys.
+  // The case: brown plastic with a green stadium around the display, a black panel, orange
+  // arrows and white kick keys, the name in green on black.
   static body = {
-    case: '#ecebe6', caseHi: '#f7f6f2', panel: '#1b1b1b', trim: '#9aa0a6', print: '#ecebe6',
-    key: '#f2f1ec', keyInk: '#3a3a3a', plate: '#1b1b1b', plateInk: '#5fbf5a', grille: 'rgba(40, 40, 40, 0.3)', padLabel: '',
+    case: '#6a3a24', caseHi: '#7e4a30', panel: '#141414', trim: '#9a7a62', print: '#ece8dc',
+    key: '#f07a2a', keyInk: '#4a1a06', plate: '#141414', plateInk: '#46c25e', grille: 'rgba(30, 12, 4, 0.5)', padLabel: '',
+    surround: ['#2f9a46', '#48b85c'],
   };
   static help = 'Move away from your corner to start, find a marked position with a clear path to the goal, and '
     + 'Kick: 1 point. Stay out of the goalkeeper\'s reach: if he touches you or the ball, it changes hands. Each '

@@ -40,6 +40,7 @@ export class AutoRace {
       [{ lever: 'steer', labels: ['L', '', 'R'], title: 'STEER' }, 'start'],
     ],
     split: 1,
+    besideWindow: 'gear',                 // on a phone: the gear lever beside the track, as on the original
     buttons: { start: { label: 'Start', color: '#d8d2c4' } },
   };
   static levels = ['Race'];

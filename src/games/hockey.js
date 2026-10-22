@@ -45,17 +45,25 @@ export class Hockey extends CourtGame {
   static year = 1978;
   static actions = ['shoot', 'shoot2'];
   static controls = {
-    columns: [['shoot'], 'arrows', ['shoot2', 'switch']],
+    columns: [['shoot'], 'arrows', ['shoot2']],
     split: 2,
+    switchBelow: true,
+    mirror: true,
+    compact: true,                        // on a phone: one row of same-size keys (see style.css)
+    switchTop: true,                      // landscape: the switch above the display...
+    landscapeHide: ['shoot'],                // ...and one shoot key, on the right
+    keysFirst: true,                      // ...as big as the football games', the display giving way
     dot: 'down',
-    buttons: { shoot: { label: 'Shoot', color: '#e8e4da' }, shoot2: { label: 'Shoot', color: '#e8e4da' } },
+    buttons: { shoot: { label: 'Shoot', color: '#f0702a' }, shoot2: { label: 'Shoot', color: '#f0702a' } },
   };
   static levels = ['Pro 1', 'Pro 2'];
   static arrowsLegend = 'Skate (down, between plays, shows the scoreboard)';
-  // The case: white plastic, a black panel, silver arrows and white shoot keys.
+  // The case: blue plastic with a light-blue stadium around the display, a black panel, white
+  // arrows and orange shoot keys, the name in orange on black.
   static body = {
-    case: '#eeeeea', caseHi: '#f8f8f5', panel: '#1b1b1d', trim: '#9aa0a6', print: '#eeeeea',
-    key: '#c9ccd1', keyInk: '#2a2a2a', plate: '#1b1b1d', plateInk: '#5aa8e6', grille: 'rgba(40, 40, 40, 0.3)', padLabel: '',
+    case: '#2f6fc0', caseHi: '#3d80d2', panel: '#151517', trim: '#7fa9dc', print: '#eef2f8',
+    key: '#f1f1ec', keyInk: '#2a2a2a', plate: '#151517', plateInk: '#f05a28', grille: 'rgba(10, 30, 70, 0.45)', padLabel: '',
+    surround: ['#7fb0e0', '#a8cdf0'],
   };
   static help = 'Skate with the arrows, find one of the seven scoring positions in front of the net with a clear '
     + 'shot, and Shoot. Keep moving: stand still near a Defenseman and he steals the puck. Skating into a player is '

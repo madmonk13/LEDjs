@@ -289,6 +289,76 @@ body.fill #bar { background: none; }
 #device .lever-wrap.vertical .lever-knob { left: 38%; }
 #device .lever-wrap:not(.vertical) .lever-knob { top: 40%; }
 
+/* Compact (the court games on a phone, in portrait): the shoot keys either side of the cross,
+   level with its up arrow as on the originals, everything one size and closely spaced, so the
+   row fits the phone's width with the keys as big as the football games'. */
+#device.fill.compact:not(.landscape) { --key-m: 0.3; --pad-gap: 0.5; }
+#device.fill.compact:not(.landscape) .panel { justify-content: center; align-items: flex-start; column-gap: calc(var(--u) * 1.1); padding-top: calc(var(--u) * 3.6); }
+#device.fill.compact:not(.landscape) .group { flex: 0 0 auto; gap: calc(var(--u) * 1.1); }
+#device.fill.compact:not(.landscape) .group > .actions { align-self: flex-start; }
+#device.fill.compact:not(.landscape) .action-wrap { position: relative; }
+#device.fill.compact:not(.landscape) .action-label { position: absolute; bottom: calc(100% + var(--u) * 0.6); white-space: nowrap; }
+#device.fill.compact:not(.landscape) .key.action { margin-top: calc(var(--u) * var(--key-m)); }
+
+/* Beside the display (Auto Race's gear lever on a phone, in portrait): a tall column the
+   display's height, one big slot a gear. */
+#device.beside-window .case { grid-template-areas: "beside window" "panel panel" "grille plate"; grid-template-columns: 1fr auto; }
+#device.beside-window .group:not(:has(.key, .lever)) { display: none; }
+/* Below the display: the steering lever across most of the width, Start beside it. */
+#device.beside-window .group .actions { flex-direction: row; align-items: flex-end; gap: calc(var(--u) * 2.4); width: 100%; }
+#device.beside-window .group { flex: 1; }
+#device.beside-window .group .lever-wrap { flex: 1; }
+#device.beside-window .group .lever { width: 100%; }
+#device.beside-window .group .lever-slot { flex: 1; width: auto; height: calc(var(--u) * 6.4); font-size: calc(var(--u) * 1.8); }
+#device.beside-window .group .lever-knob { width: calc(var(--u) * 3.6); height: calc(var(--u) * 3.6); }
+#device .case > .lever-wrap.beside { grid-area: beside; align-self: stretch; justify-self: stretch; margin-right: calc(var(--u) * 1.6); }
+#device .case > .lever-wrap.beside .lever { flex: 1; width: 100%; }
+#device .case > .lever-wrap.beside .lever-slot { flex: 1; width: 100%; height: auto; font-size: calc(var(--u) * 2.6); padding-right: calc(var(--u) * 1.2); }
+#device .case > .lever-wrap.beside .lever-knob { width: calc(var(--u) * 5); height: calc(var(--u) * 5); }
+
+/* Landscape, the switch above the display (Baseball and the court games). */
+#device.landscape.switch-top .case { grid-template-areas: "side swt pad" "side window pad" "side plate pad"; grid-template-rows: auto 1fr auto; }
+#device.landscape.switch-top.arrows-left .case { grid-template-areas: "pad swt side" "pad window side" "pad plate side"; }
+#device .case > .skill.switch-top { grid-area: swt; justify-self: center; margin: 0; }
+#device.landscape .hide-landscape { display: none; }
+/* A column left with nothing showing (its switch moved, its key hidden) takes no room. */
+#device .actions:empty, #device.landscape .actions:not(:has(> :not(.hide-landscape))) { display: none; }
+/* Landscape, Auto Race: Start above the steering lever. */
+#device.landscape .actions:has(> .lever-wrap) > .action-wrap { order: -1; }
+/* Portrait on a phone, Baseball: its three columns spread evenly across the panel. */
+#device.fill:not(.landscape).even-columns .group { display: contents; }
+#device.fill:not(.landscape).even-columns .panel { justify-content: space-evenly; }
+/* Portrait, Auto Race below the track: Steer and Start labelled on one line, the lever and the key
+   level beneath them, the same height. */
+#device.beside-window .group .actions { align-items: flex-start; }
+#device.beside-window .group .key.action { height: calc(var(--u) * 6.4); }
+
+/* Side flippers (Bowling): long orange ribbed keys down both sides of the display. */
+#device.side-keys .case { grid-template-areas: "flipL window flipR" "panel panel panel" "plate plate plate"; grid-template-columns: auto 1fr auto; }
+#device.side-keys .grille { display: none; }
+#device.side-keys .plate { justify-self: center; }
+#device.landscape.side-keys .case { grid-template-areas: "flipL window panel flipR" "flipL plate panel flipR"; grid-template-columns: auto 1fr auto auto; grid-template-rows: 1fr auto; }
+#device.landscape.side-keys .window { justify-self: center; }
+#device.landscape.side-keys .panel { display: flex; flex-direction: column; justify-content: center; align-self: stretch; }
+#device .key.flipper {
+  align-self: stretch; width: calc(var(--u) * 6.5);
+  border-radius: calc(var(--u) * 1.2);
+  background:
+    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.22) 0 calc(var(--u) * 0.35), transparent calc(var(--u) * 0.35) calc(var(--u) * 0.9)),
+    linear-gradient(90deg, color-mix(in srgb, var(--btn) 80%, black), color-mix(in srgb, var(--btn) 100%, white 12%) 45%, color-mix(in srgb, var(--btn) 85%, black));
+  box-shadow: 0 calc(var(--u) * 0.5) 0 color-mix(in srgb, var(--btn) 45%, black), 0 calc(var(--u) * 0.9) calc(var(--u) * 1.2) rgba(0, 0, 0, 0.5);
+}
+#device .key.flipper { display: flex; align-items: center; justify-content: center; }
+#device .flip-face {
+  writing-mode: vertical-rl; transform: rotate(180deg);
+  color: rgba(40, 14, 4, 0.72); font-weight: 800; font-size: calc(var(--u) * 1.7); letter-spacing: 0.22em;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+#device .key.flipper.right .flip-face { transform: none; }
+#device .key.flipper.left { grid-area: flipL; }
+#device .key.flipper.right { grid-area: flipR; }
+#device .key.flipper.isdown { box-shadow: 0 calc(var(--u) * 0.1) 0 color-mix(in srgb, var(--btn) 45%, black); filter: brightness(0.9); }
+
 /* Speaker grille and the name plate. */
 #device .grille {
   grid-area: grille;

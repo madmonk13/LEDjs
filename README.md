@@ -23,6 +23,7 @@ games' names are generic; the originals were trademarks of their makers.
 | Basketball | 1978 | Following its instruction manual: five defenders guarding the basket, the 24-second clock, 2-point baskets from the marked shooting positions (blocked shots to be won back, the rest off the backboard), four 12-minute quarters. |
 | Football 2 | 1978 | Following its instruction manual: a 10-yard field that wraps, running in any direction, passing (with interceptions and incompletes), punts, field goals, kickoffs and runbacks, safeties, four 15-minute quarters, Pro 1 to Pro 4. |
 | Hockey | 1978 | Following its instruction manual: the 18-position rink, three Defensemen and a Goalie who leaves the net, the seven scoring positions, steals, poke checks, bumps and penalties (with the penalty box lights and power plays), three 20-minute periods. |
+| Bowling | 1979 | Following its instruction manual: one or two bowlers, seven speeds, holding the sides to line up the ball and releasing to roll, tilting the game to hook it (on a phone, tilt the phone, or hold a side), gutter balls, ten frames with real strike and spare scoring and the bonus balls, the marks symbol and the strike fanfare. The speed is a slide at the bottom, changeable between balls, and holding a side during a roll tilts rather than fouls. How the pins fall isn't in the manual: here a hook into the pocket strikes most often and a head-on hit leaves splits. |
 | Soccer | 1978 | Following its instruction manual: five blockers in their zones (two wandering, three cutting off the goal) and a goalkeeper twice as fast who wins the ball by touching it, the marked kicking positions, the 10-minute possession limit, two 45-minute halves. |
 
 Where a manual leaves something out (how fast the defense moves, exact odds), it's filled in to
@@ -50,14 +51,27 @@ running under the top bar and the notch (the phone's status bar takes the case's
 keys grow to use the room the panel has, as far as its width allows. Football 2, whose wide
 display leaves the most room, stacks its controls there: the buttons in a row on top, the run keys
 below with Pass beside them, so the keys can be bigger. Football keeps its original single row (ST
-over SC, K, the two-way forward key, up over down), which is compact enough to grow as it is. On
-larger screens the case is drawn whole, framed in the window.
+over SC, K, the two-way forward key, up over down), which is compact enough to grow as it is.
+Basketball, Hockey and Soccer pack their keys into one row of same-size keys (the shoot keys either
+side of the cross, level with its up arrow, as on the originals), the skill switch below, and their
+tall displays give up a little height so the keys can match the football games'. Auto Race puts its
+gear lever beside the track, as the original did, one big slot a gear, with the steering lever
+across the width below and Start beside it. In landscape the controls sit either side of the
+display: Baseball and the court games have their skill switch above it (the court games with the
+arrow keys on the left and a single shoot key on the right), and Auto Race has Start above its
+steering lever. On larger screens the case is drawn whole, framed in the window.
 
 | Case | Keyboard | Gamepad |
 | --- | --- | --- |
 | Arrow keys (Auto Race: steering and the gear shift) | Arrows / WASD | D-pad, left stick |
-| Game buttons (Football: Kick, Status, Score; Football 2: Pass, Kick, Status, Score; Baseball: Pitch, Hit, Run, Score; Basketball and Hockey: the two Shoot keys; Soccer: the two Kick keys; Auto Race: Start) | Z, X, C, V (or J, K, L, ;) | Bottom, right, left, top face buttons |
+| Game buttons (Football: Kick, Status, Score; Football 2: Pass, Kick, Status, Score; Baseball: Pitch, Hit, Run, Score; Basketball and Hockey: the two Shoot keys; Soccer: the two Kick keys; Auto Race: Start; Bowling: the left and right sides) | Z, X, C, V (or J, K, L, ;) | Bottom, right, left, top face buttons |
 | Pause / resume | P | Start |
+
+Bowling's sides run the length of the case, as the original's flippers did: hold both to bring up
+the ball, hold one to move it, let go to roll. While it rolls, hold a side (or an arrow key) to
+tilt toward it, or on a phone tilt the phone itself (iPhone asks once for permission to read the
+motion sensor). On the original, tilting slid the strip of ball lights sideways by gravity. The
+speed is the 1-7 slide at the bottom of the case.
 
 Auto Race's levers are tapped to a position (or moved with the keys: left and right steer, up and
 down shift). On Basketball, Hockey and Soccer the down arrow is printed with a dot: between plays it

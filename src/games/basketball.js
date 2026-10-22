@@ -24,18 +24,26 @@ export class Basketball extends CourtGame {
   static year = 1978;
   static actions = ['shoot', 'shoot2'];
   static controls = {
-    columns: [['shoot'], 'arrows', ['shoot2', 'switch']],
+    columns: [['shoot'], 'arrows', ['shoot2']],
     split: 2,
+    switchBelow: true,
+    mirror: true,
+    compact: true,                        // on a phone: one row of same-size keys (see style.css)
+    switchTop: true,                      // landscape: the switch above the display...
+    landscapeHide: ['shoot'],                // ...and one shoot key, on the right
+    keysFirst: true,                      // ...as big as the football games', the display giving way
     dot: 'down',
     buttons: { shoot: { label: 'Shoot', color: '#3e8fdc' }, shoot2: { label: 'Shoot', color: '#3e8fdc' } },
   };
   static levels = ['1', '2'];
   static switchLabels = ['1', '2'];
   static arrowsLegend = 'Move (down, the dotted arrow, repeats the score)';
-  // The case: cream plastic, a black control panel, red arrows and blue shoot buttons.
+  // The case: cream plastic with a cream stadium around the display, a black control panel, red
+  // arrows and blue shoot buttons.
   static body = {
     case: '#e6dfcc', caseHi: '#f2ecdc', panel: '#1d1b19', trim: '#b9a789', print: '#ece8dc',
     key: '#e2483a', keyInk: '#5a140e', plate: '#1d1b19', plateInk: '#f08a2a', grille: 'rgba(60, 50, 35, 0.35)', padLabel: '',
+    surround: ['#d6cfbb', '#ece6d6'],
   };
   static help = 'Move away from your corner to start the 24-second clock, find a marked position with no defender '
     + 'between you and the basket, and Shoot: 2 points. Score as often as you can in 24 seconds. A blocked shot can '

@@ -67,17 +67,17 @@ export class Football2 {
     mirror: true,
     runRow: 'pass',                       // stacked on a phone: Pass beside the run keys
     buttons: {
-      score: { label: 'Score', color: '#3e8fdc' }, status: { label: 'Status', color: '#3e8fdc' },
-      kick: { label: 'Kick', color: '#3e8fdc' }, pass: { label: 'Pass', color: '#f2c230' },
+      score: { label: 'Score', color: '#2fb4d8' }, status: { label: 'Status', color: '#2fb4d8' },
+      kick: { label: 'Kick', color: '#2fb4d8' }, pass: { label: 'Pass', color: '#e6e45a' },
     },
   };
   static levels = ['Pro 1', 'Pro 2', 'Pro 3', 'Pro 4'];
   static levelModifier = 'kick';          // hold Kick while moving the switch for Pro 3 / Pro 4
-  // The case: dark green plastic, a darker control panel with a gold outline,
-  // orange-red run keys, blue buttons and a yellow Pass button.
+  // The case: teal-green plastic, the control panel the same with a light outline, orange run
+  // keys, cyan buttons and a pale yellow Pass button, the name in white on dark green.
   static body = {
-    case: '#1f4a2f', caseHi: '#2b5d3c', panel: '#173a25', trim: '#c9b07a', print: '#ece8dc',
-    key: '#e2573a', keyInk: '#5a1a0e', plate: '#d6c493', plateInk: '#1d1a12', padLabel: 'RUN',
+    case: '#1d5a50', caseHi: '#26695d', panel: '#1a5148', trim: '#c8d6cf', print: '#e8f0ec',
+    key: '#f0783c', keyInk: '#4a1a06', plate: '#17463f', plateInk: '#ffffff', padLabel: 'RUN',
   };
   static help = 'Arrow keys move one yard per press. Off the end of the field you come back in at the start. '
     + 'Pass from behind the line to the receiver (the blinking blip) in your lane. Kick at the start of a play punts; '

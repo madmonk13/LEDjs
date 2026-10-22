@@ -41,6 +41,10 @@ export class Device {
   //            them out as Football's: a two-way forward key beside up over down;
   //            keyColors: { direction: colour } for arrow keys of their own colour
   //   stack:   false keeps a phone from stacking the controls in two rows
+  //   switchTop: in landscape, the skill switch above the display
+  //   sideKeys: two buttons as long flippers down the case's sides, beside the display (Bowling's)
+  //   landscapeHide: buttons left out in landscape (the court games' second shoot key)
+  //   evenColumns: on a phone in portrait, all the columns spread evenly across the panel
   //   switchBelow: the skill switch on its own row under all the keys (Football's)
   //   mirror:  the game buttons the run keys' size, spaced as they are (Football's, whose
   //            two halves mirror each other)
@@ -69,6 +73,9 @@ export class Device {
     root.style.setProperty('--keys-k', C0.keyScale || 1);
     root.style.setProperty('--act-h', C0.keyHeight || 5);
     root.classList.toggle('mirror-keys', !!C0.mirror);
+    root.classList.toggle('compact', !!C0.compact);
+    root.classList.toggle('even-columns', !!C0.evenColumns);
+    root.classList.toggle('side-keys', !!C0.sideKeys);
 
     const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html !== undefined) e.innerHTML = html; return e; };
     const kase = el('div', 'case');
@@ -90,7 +97,7 @@ export class Device {
         if (id === 'switch') { col.append(this.makeSwitch(el, G)); continue; }
         if (typeof id === 'object' && id.lever) { col.append(this.makeLever(el, id)); continue; }
         const b = C.buttons[id];
-        const wrap = el('div', 'action-wrap');
+        const wrap = el('div', `action-wrap${(C.landscapeHide || []).includes(id) ? ' hide-landscape' : ''}`);
         const k = el('button', 'key action', b.face ? `<span class="key-face">${b.face}</span>` : undefined);
         k.style.setProperty('--btn', b.color);
         k.setAttribute('aria-label', b.label);
@@ -113,6 +120,15 @@ export class Device {
     const plate = el('div', 'plate', `<b>${G.title.toUpperCase()}</b>`);
 
     kase.append(win, panel, grille, plate);
+    // Bowling's flippers: long ribbed keys down both sides, beside the display.
+    (C.sideKeys || []).forEach((id, i) => {
+      const b = C.buttons[id];
+      const k = el('button', `key flipper ${i ? 'right' : 'left'}`, b.face ? `<span class="flip-face">${b.face}</span>` : undefined);
+      k.style.setProperty('--btn', b.color);
+      k.setAttribute('aria-label', b.label);
+      kase.append(k);
+      this.bind(id, k);
+    });
     root.append(kase);
     this.setSkill(skill);
   }

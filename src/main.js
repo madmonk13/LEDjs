@@ -322,7 +322,25 @@ function showBooting(title) {
 }
 function hideBooting() { clearTimeout(bootTimer); $('booting').hidden = true; }
 $('booting').addEventListener('pointerdown', hideBooting);
-device.onPress = hideBooting;
+device.onPress = () => { hideBooting(); askForMotion(); };
+
+// Tilting the phone (Bowling hooks the ball with it): the left-right tilt, -1 to 1 (about 25
+// degrees is full tilt), whichever way the screen is turned. iOS asks permission, which has to
+// come from a tap, so it's asked on the first press of a key in a game that uses it.
+let motionAsked = false;
+function askForMotion() {
+  if (motionAsked || !state.game?.constructor.motion || typeof DeviceOrientationEvent === 'undefined') return;
+  motionAsked = true;
+  const listen = () => window.addEventListener('deviceorientation', (e) => {
+    if (e.gamma === null || !state.game?.setTilt) return;
+    const angle = (screen.orientation && screen.orientation.angle) || window.orientation || 0;
+    const t = angle === 90 ? e.beta : angle === -90 || angle === 270 ? -e.beta : angle === 180 ? -e.gamma : e.gamma;
+    state.game.setTilt(Math.max(-1, Math.min(1, t / 25)));
+  });
+  if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+    DeviceOrientationEvent.requestPermission().then((r) => { if (r === 'granted') listen(); }).catch(() => {});
+  } else listen();
+}
 
 // ---------------------------------------------------------------- layout
 
@@ -385,23 +403,63 @@ function layout() {
   // the panel, grille and plate below it); in landscape, the middle, with the controls either side.
   // (The case's padding and the stadium surround take 8.4 units across and down; in portrait
   // the panel, grille, plate and gaps take about 33 more down; in landscape the plate about 6.)
+  // A phone in portrait can put one of the controls beside the display (Auto Race's gear lever,
+  // where the original had it): the display then takes most of the width, the control the rest.
+  const besideName = fill && !landscape ? state.game.constructor.controls.besideWindow : null;
+  placeBeside(el, besideName);
+  // The skill switch: where the case has it, on its own row under the keys, or (in landscape, for
+  // some games) above the display; the display leaves room for it.
+  const switchTop = placeSwitch(el, landscape);
+  // (Side flippers, Bowling's, take about 8 units from the width on each side.)
+  const sideW = state.game.constructor.controls.sideKeys ? u * 17 : 0;
   const winW = landscape
-    ? Math.min(w * 0.44, (h - u * 15) * aspect)
-    : Math.min(w - u * 8.4, (h - u * 41.5) * aspect);
+    ? Math.min(w * 0.44 - sideW, (h - u * (switchTop ? 22 : 15)) * aspect)
+    : besideName
+      ? Math.min((w - u * 8.4) * 0.7, (h - u * 34) * aspect)
+      : Math.min(w - u * 8.4 - sideW, (h - u * 41.5) * aspect);
   el.style.setProperty('--win-w', `${winW}px`);
   scaleControls(fill, landscape, u);
-  if (fill) fitInside(el, winW, aspect, H - sb - u * 1.6);
+  if (fill) fitInside(el, winW, aspect, H - sb - u * 1.6, !!state.game.constructor.controls.keysFirst);
   screen.fit();
   drawNow();
 }
 
-// A switch on its own row under all the keys (Football's) belongs to the panel; in landscape,
-// where the panel is split either side of the display, it goes under the buttons instead.
-function placeSwitchRow(dev, landscape) {
-  const sw = dev.querySelector('.switch-row');
-  if (!sw) return;
-  const home = landscape ? dev.querySelector('.group.left') : dev.querySelector('.panel');
-  if (sw.parentNode !== home) home.append(sw);
+// Auto Race's gear lever beside the display (a phone in portrait): moved out of the panel into the
+// case, and back when the screen turns or grows.
+function placeBeside(dev, name) {
+  const home = dev._besideHome;
+  if (home && (!name || home.name !== name)) {
+    if (home.parent.isConnected) home.parent.insertBefore(home.el, home.next);
+    home.el.classList.remove('beside');
+    dev._besideHome = null;
+  }
+  dev.classList.toggle('beside-window', !!name);
+  if (!name || dev._besideHome) return;
+  const wrap = device.levers[name]?.el.closest('.lever-wrap');
+  if (!wrap) return;
+  dev._besideHome = { name, el: wrap, parent: wrap.parentNode, next: wrap.nextSibling };
+  wrap.classList.add('beside');
+  dev.querySelector('.case').insertBefore(wrap, dev.querySelector('.window'));
+}
+
+// The skill switch. In landscape, a game with controls.switchTop has it above the display (the
+// sides then hold just the keys); a switch on its own row under all the keys (Football's) goes
+// under the buttons there, as the panel is split either side of the display. Otherwise it's
+// where the case put it. Returns whether it's above the display.
+function placeSwitch(dev, landscape) {
+  const sw = dev.querySelector('.skill');
+  if (!sw) return false;
+  if (!dev._swHome || dev._swHome.el !== sw || !dev._swHome.parent.isConnected) {
+    dev._swHome = { el: sw, parent: sw.parentNode, next: sw.nextSibling };
+  }
+  const top = landscape && !!state.game.constructor.controls.switchTop;
+  dev.classList.toggle('switch-top', top);
+  sw.classList.toggle('switch-top', top);
+  if (top) { if (sw.parentNode !== dev.querySelector('.case')) dev.querySelector('.case').append(sw); return true; }
+  if (landscape && sw.classList.contains('switch-row')) { dev.querySelector('.group.left').append(sw); return false; }
+  const home = dev._swHome;
+  if (sw.parentNode !== home.parent) home.parent.insertBefore(sw, home.next && home.next.parentNode === home.parent ? home.next : null);
+  return false;
 }
 
 // Stacking moves one control into the run keys' row (before the cross); unstacking puts it back
@@ -423,9 +481,15 @@ function unstack(dev) {
 // Filling a phone, the case's contents must end above the screen's bottom edge (a tall display,
 // like Auto Race's, uses most of the height): if they don't, the keys go back to their usual size,
 // then the display gives up what's still over.
-function fitInside(el, winW, aspect, bottom) {
+function fitInside(el, winW, aspect, bottom, keysFirst = false) {
   const over = () => Math.max(...[...el.querySelectorAll('.plate, .grille, .panel')].map((e) => e.getBoundingClientRect().bottom)) - bottom;
   if (over() <= 0) return;
+  // Keys first: the display shrinks to make room (it's sized by its width; height follows).
+  if (keysFirst) {
+    let w = winW;
+    for (let i = 0; i < 3 && over() > 0; i++) { w = Math.max(80, w - over() * aspect); el.style.setProperty('--win-w', `${w}px`); }
+    if (over() <= 0) return;
+  }
   // Shrink the grown keys just enough (a few tries, as the panel's height isn't all keys)...
   const panel = el.querySelector('.panel');
   const base = parseFloat(getComputedStyle(el).getPropertyValue('--u'));
@@ -449,7 +513,6 @@ function scaleControls(fill, landscape, u) {
   if (!panel) return;
   panel.style.removeProperty('--u');
   unstack(dev);
-  placeSwitchRow(dev, landscape);
   if (!fill) return;
   const groups = [...panel.querySelectorAll('.group')];
   const kidsOf = (g) => [...g.children];
@@ -480,7 +543,23 @@ function scaleControls(fill, landscape, u) {
     const win = dev.querySelector('.window').getBoundingClientRect();
     const plate = dev.querySelector('.plate').getBoundingClientRect();
     const roomH = plate.top - win.bottom - u * 6;
-    scale = Math.min(scale, box.width / n.w, roomH / n.h);
+    const C = state.game.constructor.controls;
+    if (dev.classList.contains('compact')) {
+      // Compact (the court games): the keys packed in one centred row, 1.1 units apart, the
+      // panel's padding either side; the switch row and the panel's padding below and above.
+      const kids = groups.flatMap(kidsOf).filter((e) => !e.classList.contains('switch-row'));
+      const cs = getComputedStyle(panel);
+      n.w = kids.reduce((t, e) => t + e.offsetWidth, 0) + u * 1.1 * (kids.length - 1) + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+      n.h = Math.max(...kids.map((e) => e.offsetHeight)) + (swRow ? swRow.offsetHeight + u * 1.8 : 0) + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+    }
+    // Keys first (the court games): the keys grow to fill the width, and the display gives up
+    // the height they need (see fitInside).
+    // (Below a control beside the display, the steering lever stretches across the width, so
+    // only the height limits it.)
+    // (A compact row is kept a little short of the full width, so rounding never wraps it.)
+    const widthLimit = dev.classList.contains('beside-window') ? Infinity
+      : (box.width * (dev.classList.contains('compact') ? 0.96 : 1)) / n.w;
+    scale = Math.min(C.maxGrow || 1.8, widthLimit, C.keysFirst ? Infinity : roomH / n.h);
     // Stacked: the buttons in one row (each column's keys side by side), the run keys in another
     // with one control beside them (the game's choice, controls.runRow: Football 2's Pass; else the
     // skill switch); the wider row against the width, both rows (and the gap) against the height.

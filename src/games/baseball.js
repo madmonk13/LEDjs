@@ -63,16 +63,20 @@ export class Baseball {
   static controls = {
     columns: [['score', 'pitch'], ['switch'], ['run', 'hit']],
     split: 2,
+    switchTop: true,                      // landscape: the switch above the display
+    evenColumns: true,                    // portrait on a phone: the columns spread evenly
     buttons: {
       score: { label: 'Score', color: '#3e8fdc' }, pitch: { label: 'Pitch', color: '#3e8fdc' },
       run: { label: 'Run', color: '#3e8fdc' }, hit: { label: 'Hit', color: '#e4483a' },
     },
   };
   static levels = ['Pro 1', 'Pro 2'];
-  // The case: tan plastic, a dark control panel with a gold outline, no arrow keys.
+  // The case: tan plastic and a tan stadium around the display, a dark control panel with a gold
+  // outline, no arrow keys, the name in light letters on dark.
   static body = {
     case: '#b49d72', caseHi: '#c9b48a', panel: '#2e2620', trim: '#c9b07a', print: '#ece8dc',
-    plate: '#e6dcc0', plateInk: '#1d1a12', grille: 'rgba(60, 45, 25, 0.45)',
+    plate: '#2a241c', plateInk: '#ece6d6', grille: 'rgba(60, 45, 25, 0.45)',
+    surround: ['#a38a5f', '#bca377'],
   };
   static help = 'Pitch, then Hit when the ball is in the strike zone (the last lights before the plate). '
     + 'A steady fielder light is a hit: the beeps say how many bases it might be worth. Hold Run to run; '
